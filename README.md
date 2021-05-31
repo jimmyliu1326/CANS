@@ -1,2 +1,2 @@
-# CANS **C**onsensus calling for **A**mplicon **N**anopore **S**equencing
+# CANS Consensus calling for Amplicon Nanopore Sequencing
 Snakemake pipeline to generate amplicon consensus sequence for Nanopore sequencing data
