@@ -12,7 +12,6 @@ suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(plotly))
-suppressPackageStartupMessages(library(gt))
 ```
 
 ```{r parse-arguments, echo = F}
