@@ -1,7 +1,7 @@
 # CANS: Consensus calling for Amplicon Nanopore Sequencing
 
 ## Description
-Snakemake pipeline to generate amplicon consensus sequence for Nanopore sequencing data
+A Snakemake pipeline designed to generate consensus sequences for target amplicon Nanopore sequencing. The pipeline supports dehosting of raw reads followed by automated selection of the most probable full-length reads for consensus building.
 
 ## Usage
 ```
