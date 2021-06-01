@@ -24,17 +24,17 @@ jobs:
       - run:
           name: Setup Miniconda
           command: |
-            apt update
-            apt install -y wget
-            cd $HOME
-            wget "https://repo.anaconda.com/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh" -O miniconda.sh
-            printf '%s' "8a324adcc9eaf1c09e22a992bb6234d91a94146840ee6b11c114ecadafc68121  miniconda.sh" | sha256sum -c
-            bash miniconda.sh -b -p $HOME/miniconda
+            export MINICONDA=$HOME/miniconda
+            echo "export PATH=$MINICONDA/bin:$PATH" >> $BASH_ENV
+            source $BASH_ENV
+            hash -r
+            wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+            bash miniconda.sh -b -f -p $MINICONDA
+            conda config --set always_yes yes
+            conda update conda
       - run:
           name: Setup environment and run tests
           command: |
-            export PATH="$HOME/miniconda/bin:$PATH"
-            conda update -y conda
             conda create -f CANS/conda_env.yml
             conda activate cans
             python --version
