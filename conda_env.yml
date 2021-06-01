@@ -14,6 +14,7 @@ dependencies:
   - r-plotly
   - r-data.table
   - r-scales
+  - r-pastecs
   - pip
   - pip:
     - pandas
