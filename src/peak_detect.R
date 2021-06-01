@@ -34,4 +34,5 @@ fastq_ids <- read_stats %>%
   pull(`#id`)
 
 # write output
-writeLines(unique(fastq_ids))
+writeLines(unique(fastq_ids), args[4])
+writeLines(as.character(best_peak), args[5])

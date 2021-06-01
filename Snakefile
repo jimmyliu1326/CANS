@@ -5,6 +5,7 @@ include: "rules/consensus.smk"
 include: "rules/dehost.smk"
 include: "rules/read_selection.smk"
 include: "rules/trim.smk"
+include: "rules/report.smk"
 
 # override current working directory
 workdir: config["outdir"]
@@ -12,4 +13,5 @@ workdir: config["outdir"]
 # define pipeline target
 rule all:
   input: 
-      expand("{sample}/consensus/consensus.fa", sample=samples_meta.Sample)
+      expand("{sample}/consensus/consensus.fa", sample=samples_meta.Sample),
+      "report_summary.html"

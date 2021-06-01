@@ -104,8 +104,8 @@ done < $INPUT_PATH
 # create output directory if does not exist
 if ! test -d $OUTPUT_PATH; then mkdir -p $OUTPUT_PATH; fi
 
-# Remove existing analysis html report and summary statistics file in OUTPUT_PATH
-if test -f $OUTPUT_PATH/summary_statistics.csv; then rm $OUTPUT_PATH/summary_statistics.csv; fi
+# Remove existing analysis html report in OUTPUT_PATH
+if test -f $OUTPUT_PATH/report_summary.html; then rm $OUTPUT_PATH/report_summary.html; fi
 
 # call snakemake
 snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
@@ -116,7 +116,7 @@ snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
   model=$MODEL \
   threads=$THREADS \
   subsample=$SUBSAMPLE \
-  reference=$REFERENCE_PATH \
+  reference=$(realpath $REFERENCE_PATH) \
   expected_l=$EXPECTED_LENGTH \
   deviation=$DEVIATION
 
@@ -124,7 +124,7 @@ snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
 if [[ $KEEP_TMP -eq 0 ]]; then
   while read lines; do
     sample=$(echo $lines | cut -f1 -d',')
-    for dir in medaka porechop draft_consensus subsample_fastq filtered_fastq; do
+    for dir in medaka porechop dehost draft_consensus subsample_fastq filtered_fastq; do
       if test -d $OUTPUT_PATH/$sample/$dir; then
         rm -rf $OUTPUT_PATH/$sample/$dir
       fi

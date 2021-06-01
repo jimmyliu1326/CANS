@@ -1,0 +1,140 @@
+---
+title: "CANS Summary Report"
+date: "`r format(Sys.time(), '%a %d %b %Y')`"
+output:
+  html_document:
+    df_print: paged	
+---
+
+```{r setup, echo = F, message = F, warning = F}
+# load library
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(gt))
+```
+
+```{r parse-arguments, echo = F}
+readlength_input <- snakemake@input[["readlength_res"]]
+output_dir <- snakemake@params[["outdir"]]
+deviation <- as.numeric(snakemake@params[["deviation"]])
+subsample_n <- as.numeric(snakemake@params[["subsample_n"]])
+best_peak_input <- snakemake@input[["best_peak"]]
+```
+
+```{r load-data, echo = F, message = F, warning = F}
+# load Read Length data
+readlength_res <- map_dfr(paste0(output_dir, "/", readlength_input), function(x) {
+  # parse sample name from input file path
+  sample <- unlist(strsplit(gsub(paste0(output_dir, "/"), "", x), "/"))[1]
+  df <- fread(x, header = T, sep = "\t") %>%
+    mutate(sample = sample)
+  return(df)
+})
+# load best peak data
+bestpeak_res <- map_dfr(paste0(output_dir, "/", best_peak_input), function(x) {
+  # parse sample name from input file path
+  sample <- unlist(strsplit(gsub(paste0(output_dir, "/"), "", x), "/"))[1]
+  df <- fread(x, header = F, sep = "\t") %>%
+		rename(best_peak = V1) %>%
+    mutate(sample = sample,
+					 best_peak = as.numeric(best_peak))
+  return(df)
+})
+```
+
+## 1. Read Selection Summary
+<div style = "width:60%; height:auto; margin: auto; float: left; margin-right: 50px;">
+```{r read-selection, echo = F, message = F, warning = F, fig.align = 'left', rows.print = 5}
+map_dfr(unique(readlength_res$sample), function(x) {
+	# get best peak of sample
+	best_peak <- bestpeak_res[bestpeak_res$sample == x, 1]
+	# count total reads
+	total <- nrow(readlength_res[readlength_res$sample == x,])
+	# count read within deviation
+	within_d <- readlength_res %>%
+		filter(sample == x,
+					 length >= as.integer(best_peak-deviation),
+					 length <= as.integer(best_peak+deviation)) %>%
+		nrow()
+	# count actual number reads used for consensus building
+	if (within_d <= subsample_n) {
+		actual <- within_d
+	} else {
+		actual <- subsample_n
+	}
+	# return output
+	output <- data.frame(sample = x,
+											 Total = total,
+											 WD = within_d,
+											 Peak = best_peak,
+											 SD = as.integer(actual))
+	return(output)
+}) %>%
+	column_to_rownames("sample") %>%
+	rename(Peak = best_peak)
+	# # create gt table
+	# gt() %>%
+	# cols_label(
+	# 	sample = "Sample",
+	# 	total = html("Total<br>Read Count"),
+	# 	within_d = html("Within Deviation<br>Read Count"),
+	# 	best_peak = html("Selected<br>Peak Length<br>(bps)"),
+	# 	actual = html("Sampling Depth<br>for Consensus")) %>%
+	# fmt_number(
+	# 	columns = c(2,3,5),
+	# 	decimals = 0) %>%
+	# fmt_number(
+	# 	columns = 4,
+	# 	decimals = 1) %>%
+	# cols_align(
+  # 	align = "center",
+  # 	columns = everything())
+```
+</div>
+<div style = "margin-left:50px; clear: right; margin-top:50px">
+
+**Total**: Total Read Count
+
+**WD**: Within Deviation Read Count
+
+**Peak**: Selected Peak Length (bps)
+
+**SD**: Sampling Depth for Consensus Building
+
+</div>
+<div style = "clear: both">
+
+<br />  
+
+## 2. Read Length Distribution
+```{r read-length, echo = FALSE, message = FALSE, out.width = '120%', out.height = '120%', warning = F}
+# format ggplotly axis titles
+layout_ggplotly <- function(gg, x, y){
+  # The 1 and 2 goes into the list that contains the options for the x and y axis labels respectively
+  gg[['x']][['layout']][['annotations']][[1]][['y']] <- x
+  gg[['x']][['layout']][['annotations']][[2]][['x']] <- y
+  gg
+}
+# plot read length distribution
+p <- readlength_res %>% 
+	ggplot(aes(x = length)) +
+	geom_density() +
+	geom_vline(data = bestpeak_res, mapping = aes(xintercept = best_peak), color = "red") +
+	scale_x_continuous(labels = comma) +
+	facet_wrap(~sample, scales = "free", ncol = 3) +
+	theme_bw()+
+	theme(panel.spacing.y = unit(30, "mm"),
+				panel.spacing.x = unit(20, "mm"),
+				axis.title.x = element_text(vjust=2.5))+
+	labs(x = "Read Length",
+			 y = "Density")
+# convert to plotly
+ggplotly(p) %>%
+	layout_ggplotly(-0.07, -0.05) %>%
+	layout(margin = list(
+    b = 55
+  ))
+```
+</div>
