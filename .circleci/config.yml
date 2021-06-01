@@ -17,6 +17,7 @@ jobs:
       - run:
           name: Clone Github Repo
           command: |
+            apt install git-all
             cd $HOME
             git clone https://github.com/jimmyliu1326/CANS.git
             chmod +x CANS/CANS.sh
