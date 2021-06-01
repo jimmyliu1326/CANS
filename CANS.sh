@@ -30,9 +30,10 @@ SUBSAMPLE=1000
 KEEP_TMP=0
 REFERENCE_PATH="NA"
 DEIVATION=50
+VERSION="1.0"
 
 # parse arguments
-opts=`getopt -o hi:o:t:s:m:r:e:s:d: -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length: -- "$@"`
+opts=`getopt -o hi:o:t:s:m:r:e:s:d:v -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length:,version -- "$@"`
 eval set -- "$opts"
 if [ $? != 0 ] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
 if [[ $1 =~ ^--$ ]] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
@@ -51,6 +52,7 @@ while true; do
         --keep-tmp) KEEP_TMP=1; shift 1;;
         --) shift; break ;;
         -h|--help) usage; exit 0;;
+        -v|--version) echo "${script_name}: v${VERSION}"; exit 0;;
     esac
 done
 
