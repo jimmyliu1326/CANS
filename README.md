@@ -19,6 +19,7 @@ Optional arguments:
 --notrim              Disable adaptor trimming by Porechop
 --keep-tmp            Keep all temporary files
 -h|--help             Display help message
+-v|--version          Print version number
 ```
 
 ## Example Pipeline Call
