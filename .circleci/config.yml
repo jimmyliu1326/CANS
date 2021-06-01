@@ -9,7 +9,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: ubuntu:bionic
+      - image: cimg/base:2021.04
     environment:
       PYTHON_VERSION: 3.8
     steps:
@@ -17,7 +17,6 @@ jobs:
       - run:
           name: Clone Github Repo
           command: |
-            apt install git-all
             cd $HOME
             git clone https://github.com/jimmyliu1326/CANS.git
             chmod +x CANS/CANS.sh
