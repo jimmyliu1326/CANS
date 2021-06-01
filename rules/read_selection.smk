@@ -20,13 +20,14 @@ rule read_selection:
     subsample_n=config["subsample"],
     pipeline_dir=config["pipeline_dir"]
   output:
-    read_ids="{sample}/filtered_fastq/{sample}.ids",
+    read_ids=temp("{sample}/filtered_fastq/{sample}.ids"),
     filter_fastq="{sample}/filtered_fastq/{sample}.fastq",
+    best_peak=temp("{sample}/best_peak.txt"),
     subsample_fastq="{sample}/subsample_fastq/{sample}.fastq"
   
   shell:
     """
-    Rscript {params.pipeline_dir}/src/peak_detect.R {input.read_stats} {params.expect} {params.deviation} > {output.read_ids}
+    Rscript {params.pipeline_dir}/src/peak_detect.R {input.read_stats} {params.expect} {params.deviation} {output.read_ids} {output.best_peak}
 
     seqtk subseq {input.reads} {output.read_ids} > {output.filter_fastq}
 
