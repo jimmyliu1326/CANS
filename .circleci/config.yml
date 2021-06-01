@@ -1,6 +1,6 @@
 # Define workflow
 workflows:
-  version: 2.1
+  version: 2
   build_and_test:
     jobs:
       - build
