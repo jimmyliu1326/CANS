@@ -1,3 +1,4 @@
+[![CANS](https://circleci.com/gh/jimmyliu1326/CANS.svg?style=svg)](https://app.circleci.com/pipelines/github/jimmyliu1326/CANS)
 # CANS: Consensus calling for Amplicon Nanopore Sequencing
 
 ## Description
