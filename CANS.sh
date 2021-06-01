@@ -2,7 +2,7 @@
 
 usage() {
 echo "
-$(basename $0) [options]
+$(basename $0) v${VERSION} [options]
 
 Required arguments:
 -i|--input            .csv file with first column as sample name and second column as path to fastq, no headers required
@@ -18,6 +18,7 @@ Optional arguments:
 --notrim              Disable adaptor trimming by Porechop
 --keep-tmp            Keep all temporary files
 -h|--help             Display help message
+-v|--version          Print version
 "
 }
 
