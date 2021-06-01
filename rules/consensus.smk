@@ -13,7 +13,7 @@ rule medaka:
     draft_consensus="{sample}/draft_consensus/draft.fasta"
   threads: config["threads"]
   params:
-    outdir="{sample}/medaka/",
+    outdir="{sample}/medaka",
     model=config["model"]
   output:
     consensus="{sample}/consensus/consensus.fa"
