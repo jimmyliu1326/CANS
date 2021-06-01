@@ -15,26 +15,26 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Clone Github Repo
-        command: |
-          cd $HOME
-          git clone https://github.com/jimmyliu1326/CANS.git
-          chmod +x CANS/CANS.sh
-          export PATH="$HOME/CANS:$PATH"
+          name: Clone Github Repo
+          command: |
+            cd $HOME
+            git clone https://github.com/jimmyliu1326/CANS.git
+            chmod +x CANS/CANS.sh
+            export PATH="$HOME/CANS:$PATH"
       - run:
-        name: Setup Miniconda
-        command: |
-          apt update
-          apt install -y wget
-          cd $HOME
-          wget "https://repo.anaconda.com/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh" -O miniconda.sh
-          printf '%s' "8a324adcc9eaf1c09e22a992bb6234d91a94146840ee6b11c114ecadafc68121  miniconda.sh" | sha256sum -c
-          bash miniconda.sh -b -p $HOME/miniconda
+          name: Setup Miniconda
+          command: |
+            apt update
+            apt install -y wget
+            cd $HOME
+            wget "https://repo.anaconda.com/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh" -O miniconda.sh
+            printf '%s' "8a324adcc9eaf1c09e22a992bb6234d91a94146840ee6b11c114ecadafc68121  miniconda.sh" | sha256sum -c
+            bash miniconda.sh -b -p $HOME/miniconda
       - run:
-        name: Setup environment and run tests
-        command: |
-          export PATH="$HOME/miniconda/bin:$PATH"
-          conda update -y conda
-          conda create -f CANS/conda_env.yml
-          conda activate cans
-          python --version
+          name: Setup environment and run tests
+          command: |
+            export PATH="$HOME/miniconda/bin:$PATH"
+            conda update -y conda
+            conda create -f CANS/conda_env.yml
+            conda activate cans
+            python --version
