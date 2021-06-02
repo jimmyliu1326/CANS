@@ -24,6 +24,5 @@ jobs:
           command: |
             CANS.sh -h
             source activate cans
-            ls /opt/conda/envs/cans/bin/m*
-            medaka -h
-            medaka_consensus -h
+            echo $(medaka --version)
+            medaka --version
