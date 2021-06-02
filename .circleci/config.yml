@@ -2,19 +2,11 @@
 jobs:
   build:
     docker:
-      - image: cimg/base:2021.04
+      - image: continuumio/miniconda3
     environment:
       PYTHON_VERSION: 3.8
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            # This branch if available
-            - v1-dep-{{ .Branch }}-
-            # Default branch if not
-            - v1-dep-master-
-            # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-            - v1-dep-
       - run:
           name: Clone Github Repo
           command: |
@@ -24,33 +16,9 @@ jobs:
             echo "export PATH=$PWD/CANS:$PATH" >> $BASH_ENV
             source $BASH_ENV
       - run:
-          name: Setup Miniconda
-          command: |
-            export MINICONDA=$HOME/miniconda
-            echo "export PATH=$MINICONDA/bin:$PATH" >> $BASH_ENV
-            source $BASH_ENV
-            hash -r
-            wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-            bash miniconda.sh -b -f -p $MINICONDA
-            conda config --set always_yes yes
-            conda update conda
-      - run:
           name: Setup environment
           command: |
             conda env create -f $HOME/CANS/conda_env.yml
-      - save_cache:
-          key: v1-dep-{{ .Branch }}-{{ epoch }}
-          paths:
-          # This is a broad list of cache paths to include many possible development environments
-          # You can probably delete some of these entries
-          - vendor/bundle
-          - ~/virtualenvs
-          - ~/.m2
-          - ~/.ivy2
-          - ~/.bundle
-          - ~/.go_workspace
-          - ~/.gradle
-          - ~/.cache/bower
       - run:
           name: Run Tests
           command: |
