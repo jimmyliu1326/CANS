@@ -4,6 +4,7 @@ workflows:
   build_and_test:
     jobs:
       - build
+      - tests
   
 # Build environment
 jobs:
@@ -35,6 +36,17 @@ jobs:
       - run:
           name: Setup environment and run tests
           command: |
-            conda create -f CANS/conda_env.yml
+            conda env create -f CANS/conda_env.yml
             conda activate cans
             python --version
+  tests:
+    docker:
+      - image: cimg/base:2021.04
+    environment:
+      PYTHON_VERSION: 3.8
+    steps:
+      - checkout
+      - run:
+          name: Clone Github Repo
+          command: |
+            CANS.sh -h
