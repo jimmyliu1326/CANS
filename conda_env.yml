@@ -4,7 +4,7 @@ channels:
   - bioconda
 dependencies:
   - snakemake-minimal
-  - medaka >= 1.3.3
+  - medaka=1.3.*
   - seqtk
   - seqkit
   - spoa
