@@ -4,6 +4,22 @@
 ## Description
 A Snakemake pipeline designed to generate consensus sequences for target amplicon Nanopore sequencing. The pipeline supports dehosting of raw reads followed by automated selection of the most probable full-length reads for consensus building.
 
+## Installation via Conda
+
+1. Clone the repository
+```
+git clone https://github.com/jimmyliu1326/CANS.git
+```
+2. Modify CANS.sh permission and add to $PATH in .bashrc
+```
+chmod +x CANS/CANS.sh
+echo "export PATH=$MINICONDA/bin:$PATH" >> ~/.bashrc
+```
+3. Create a new conda environment called `cans`
+```
+conda env create -f CANS/conda_env.yml
+```
+
 ## Usage
 ```
 Required arguments:
