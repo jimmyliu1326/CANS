@@ -24,4 +24,6 @@ jobs:
           command: |
             CANS.sh -h
             source activate cans
-            conda run -n cans medaka_consensus -h
+            echo "export PATH=/opt/conda/envs/cans/bin:$PATH" >> $BASH_ENV
+            source $BASH_ENV
+            medaka_consensus -h
