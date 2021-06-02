@@ -38,8 +38,6 @@ jobs:
           name: Setup environment
           command: |
             conda env create -f $HOME/CANS/conda_env.yml
-            source activate cans
-            python --version
       - save_cache:
           key: v1-dep-{{ .Branch }}-{{ epoch }}
           paths:
@@ -57,5 +55,6 @@ jobs:
           name: Run Tests
           command: |
             CANS.sh -h
+            source activate cans
             medaka_consensus -h
             echo $?
