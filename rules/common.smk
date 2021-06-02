@@ -18,7 +18,7 @@ def dehost_input(wildcards):
 # select input fastq for filtering
 def read_selection_input(wildcards):
   sample=wildcards["sample"]
-  if config["reference"] == "NA":
+  if os.path.basename(config["reference"]) == "NA":
     if config["trim"] == 0:
       return os.path.join(sample, sample+".fastq")
     else:
