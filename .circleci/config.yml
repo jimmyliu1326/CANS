@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Setup environment
           command: |
-            conda env create -f CANS/conda_env.yml
+            conda env create -f $HOME/CANS/conda_env.yml
             conda activate cans
             python --version
       - save_cache:
