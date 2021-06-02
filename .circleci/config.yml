@@ -26,3 +26,4 @@ jobs:
             source activate cans
             ls /opt/conda/envs/cans/bin/m*
             medaka -h
+            medaka_consensus -h
