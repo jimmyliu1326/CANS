@@ -19,12 +19,12 @@ jobs:
           name: Setup environment
           command: |
             conda env create -f $HOME/CANS/conda_env.yml
-            CANS.sh -h
-            source activate cans
-            echo "export PATH=/opt/conda/envs/cans/bin:$PATH" >> $BASH_ENV
-            source $BASH_ENV
-            medaka_consensus -h
       - run:
           name: Run Tests
           command: |
+            source activate cans
+            echo "export PATH=/opt/conda/envs/cans/bin:$PATH" >> $BASH_ENV
+            source $BASH_ENV
             CANS.sh -h
+            CANS.sh -i examples.csv -o /tmp/circleci-test-results
+            
