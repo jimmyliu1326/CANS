@@ -13,7 +13,7 @@ def dehost_input(wildcards):
   if config["trim"] == 0:
     return os.path.join(sample, sample+".fastq")
   else:
-    return os.path.join(sample, "porechop", sample+".fastq")
+    return os.path.join(sample, "porechop", sample+"_trimmed.fastq")
 
 # select input fastq for filtering
 def read_selection_input(wildcards):
@@ -22,6 +22,6 @@ def read_selection_input(wildcards):
     if config["trim"] == 0:
       return os.path.join(sample, sample+".fastq")
     else:
-      return os.path.join(sample, "porechop", sample+".fastq")
+      return os.path.join(sample, "porechop", sample+"_trimmed.fastq")
   else:
     return os.path.join(sample, "dehost", sample+".fastq")
