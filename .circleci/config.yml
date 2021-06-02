@@ -57,4 +57,5 @@ jobs:
           name: Run Tests
           command: |
             CANS.sh -h
-            CANS.sh -i CANS/example.csv -o /tmp/circleci-test-results -e 2050
+            medaka_consensus -h
+            echo $?
