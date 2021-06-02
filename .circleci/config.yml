@@ -21,7 +21,7 @@ jobs:
             cd $HOME
             git clone https://github.com/jimmyliu1326/CANS.git
             chmod +x CANS/CANS.sh
-            echo "export PATH=$HOME/CANS:$PATH" >> $BASH_ENV
+            echo "export PATH=$PWD/CANS:$PATH" >> $BASH_ENV
             source $BASH_ENV
       - run:
           name: Setup Miniconda
