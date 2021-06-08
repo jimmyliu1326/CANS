@@ -3,7 +3,7 @@ title: "CANS Summary Report"
 date: "`r format(Sys.time(), '%a %d %b %Y')`"
 output:
   html_document:
-    df_print: paged	
+    df_print: paged
 ---
 
 ```{r setup, echo = F, message = F, warning = F}
