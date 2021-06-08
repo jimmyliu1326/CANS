@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from datetime import datetime
 
 # parse samples metadata
 samples_tbl=config["samples"]
