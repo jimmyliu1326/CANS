@@ -84,7 +84,7 @@ if [[ $? != 0 ]]; then echo "${script_name}: seqkit cannot be called, check its 
 # validate model parameter input if specified
 if ! test -z $MODEL; then
   # test if invalid characters used
-  if ! [[ $MODEL =~ ^(r9|r10)$ ]]; then echo "Invalid model specification passed to the -m argument, exiting"; fi
+  if ! [[ $MODEL =~ ^(r9|r10)$ ]]; then echo "${script_name}: Invalid model specification passed to the -m argument, exiting"; fi
   # set medaka model
   if [[ $MODEL == "r9" ]]; then MODEL="r941_min_high_g360"; else MODEL="r103_min_high_g360"; fi
 else
@@ -107,9 +107,6 @@ done < $INPUT_PATH
 # create output directory if does not exist
 if ! test -d $OUTPUT_PATH; then mkdir -p $OUTPUT_PATH; fi
 
-# Remove existing analysis html report in OUTPUT_PATH
-if test -f $OUTPUT_PATH/report_summary.html; then rm $OUTPUT_PATH/report_summary.html; fi
-
 # call snakemake
 snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
   --config samples=$(realpath $INPUT_PATH) \
@@ -123,6 +120,9 @@ snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
   expected_l=$EXPECTED_LENGTH \
   deviation=$DEVIATION
 
+# get pipeline error code
+error_code=$(echo $?)
+
 # clean up temporary directories
 if [[ $KEEP_TMP -eq 0 ]]; then
   while read lines; do
@@ -133,4 +133,14 @@ if [[ $KEEP_TMP -eq 0 ]]; then
       fi
     done
   done < $INPUT_PATH
+fi
+
+# check pipeline success
+if [[ $error_code -eq 0 ]]; then
+  echo "${script_name}: Analysis ran to completion successfully!"
+  echo "${script_name}: Results have been written to: $(realpath $OUTPUT_PATH)"
+  exit 0
+else
+  echo "${script_name}: Error(s) encountered during analysis run, check the above logs"
+  exit 1
 fi
