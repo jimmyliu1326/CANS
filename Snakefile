@@ -14,4 +14,4 @@ workdir: config["outdir"]
 rule all:
   input: 
       expand("{sample}/consensus/consensus.fa", sample=samples_meta.Sample),
-      "report_summary.html"
+      os.path.join("CANS_report_"+datetime.today().strftime('%Y%m%d%H%M%S')+".html")
