@@ -9,6 +9,7 @@ dependencies:
   - seqkit
   - spoa
   - porechop
+  - nanofilt
   - r-base
   - r-tidyverse
   - r-plotly
