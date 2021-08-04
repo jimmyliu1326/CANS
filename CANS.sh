@@ -8,8 +8,10 @@ Required arguments:
 -i|--input            .csv file with first column as sample name and second column as path to fastq, no headers required
 -o|--output           Path to output directory
 -e|--expected_length  Expected sequence length (bps) of target amplicon
+--mode                Select the mode for full-length reads identification (Options: dynamic/static)
 
 Optional arguments:
+--primers             Path to FASTA file containing forward and reverse primer sequences to select PCR products for consensus building
 -r|--reference        Reference sequence used for dehosting
 -s|--subsample        Specify the target coverage for consensus calling [Default = 1000]
 -d|--deviation        Specify the read length deviation from (+/-) expected read length allowed for consensus building [Default = 50 bps]
@@ -32,9 +34,11 @@ KEEP_TMP=0
 REFERENCE_PATH="NA"
 DEVIATION=50
 VERSION="1.0"
+PRIMERS_PATH="NA"
+EXPECTED_LENGTH=0
 
 # parse arguments
-opts=`getopt -o hi:o:t:s:m:r:e:s:d:v -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length:,version -- "$@"`
+opts=`getopt -o hi:o:t:s:m:r:e:s:d:v -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length:,version,primers:,mode: -- "$@"`
 eval set -- "$opts"
 if [ $? != 0 ] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
 if [[ $1 =~ ^--$ ]] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
@@ -44,6 +48,8 @@ while true; do
         -i|--input) INPUT_PATH=$2; shift 2;;
         -o|--output) OUTPUT_PATH=$2; shift 2;;
         -r|--reference) REFERENCE_PATH=$2; shift 2;;
+        --mode) MODE=$2; shift 2;;
+        --primers) PRIMERS_PATH=$2; shift 2;;
         -t|--threads) THREADS=$2; shift 2;;
         -m|--model) MODEL=$2; shift 2;;
         -s|--subsample) SUBSAMPLE=$2; shift 2;;
@@ -60,7 +66,11 @@ done
 # check if required arguments are given
 if test -z $INPUT_PATH; then echo "${script_name}: Required argument -i is missing, exiting"; exit 1; fi
 if test -z $OUTPUT_PATH; then echo "${script_name}: Required argument -o is missing, exiting"; exit 1; fi
-if test -z $EXPECTED_LENGTH; then echo "${script_name}: Required argument -e is missing, exiting"; exit 1; fi
+if test -z $MODE; then echo "${script_name}: Required argument --mode is missing, exiting"; exit 1; fi
+if [[ $EXPECTED_LENGTH -eq 0 ]]; then echo "${script_name}: Required argument -e is missing, exiting"; exit 1; fi
+
+# validate mode selection
+if ! [[ $MODE =~ ^(dynamic|static)$ ]]; then echo "${script_name}: Invalid mode option passed to the --mode argument, accepted values are dynamic/static, exiting"; exit 1; fi
 
 # check dependencies
 medaka_consensus -h 2&>1 /dev/null
@@ -81,6 +91,9 @@ if [[ $? != 0 ]]; then echo "${script_name}: spoa cannot be called, check its in
 seqkit -h > /dev/null
 if [[ $? != 0 ]]; then echo "${script_name}: seqkit cannot be called, check its installation"; exit 1; fi
 
+NanoFilt -h > /dev/null
+if [[ $? != 0 ]]; then echo "${script_name}: nanofilt cannot be called, check its installation"; exit 1; fi
+
 # validate model parameter input if specified
 if ! test -z $MODEL; then
   # test if invalid characters used
@@ -90,6 +103,12 @@ if ! test -z $MODEL; then
 else
   # Set default model if not specified
   if test -z $MODEL; then MODEL="r941_min_high_g360"; fi
+fi
+
+# validate primers FASTA file
+if [[ $PRIMERS_PATH != "NA" ]]; then
+  primers_n=$(cat $PRIMERS_PATH | grep ">" | wc -l)
+  if [[ $primers_n -ne 2 ]]; then echo "${script_name}: Primers FASTA file should only contain two sequences, exiting"; exit 1; fi
 fi
 
 # validate input samples.csv
@@ -108,7 +127,7 @@ done < $INPUT_PATH
 if ! test -d $OUTPUT_PATH; then mkdir -p $OUTPUT_PATH; fi
 
 # call snakemake
-snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
+snakemake -k --snakefile $script_dir/Snakefile --cores $THREADS \
   --config samples=$(realpath $INPUT_PATH) \
   outdir=$(realpath $OUTPUT_PATH) \
   pipeline_dir=$script_dir \
@@ -118,7 +137,9 @@ snakemake --snakefile $script_dir/Snakefile --cores $THREADS \
   subsample=$SUBSAMPLE \
   reference=$(realpath $REFERENCE_PATH) \
   expected_l=$EXPECTED_LENGTH \
-  deviation=$DEVIATION
+  deviation=$DEVIATION \
+  mode=$MODE \
+  primers=$(realpath $PRIMERS_PATH)
 
 # get pipeline error code
 error_code=$(echo $?)
@@ -127,7 +148,7 @@ error_code=$(echo $?)
 if [[ $KEEP_TMP -eq 0 ]]; then
   while read lines; do
     sample=$(echo $lines | cut -f1 -d',')
-    for dir in medaka porechop dehost draft_consensus subsample_fastq filtered_fastq; do
+    for dir in medaka porechop dehost draft_consensus subsample_fastq length_fastq primers_fastq filtered_fastq; do
       if test -d $OUTPUT_PATH/$sample/$dir; then
         rm -rf $OUTPUT_PATH/$sample/$dir
       fi
