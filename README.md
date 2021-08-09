@@ -27,8 +27,10 @@ Required arguments:
 -i|--input            .csv file with first column as sample name and second column as path to fastq, no headers required
 -o|--output           Path to output directory
 -e|--expected_length  Expected sequence length (bps) of target amplicon
+--mode                Select the mode for full-length reads identification (Options: dynamic/static)
 
 Optional arguments:
+--primers             Path to FASTA file containing forward and reverse primer sequences to select PCR products for consensus building
 -r|--reference        Reference sequence used for dehosting
 -s|--subsample        Specify the target coverage for consensus calling [Default = 1000]
 -d|--deviation        Specify the read length deviation from (+/-) expected read length allowed for consensus building [Default = 50 bps]
@@ -37,7 +39,7 @@ Optional arguments:
 --notrim              Disable adaptor trimming by Porechop
 --keep-tmp            Keep all temporary files
 -h|--help             Display help message
--v|--version          Print version number
+-v|--version          Print version
 ```
 
 ## Example Pipeline Call
