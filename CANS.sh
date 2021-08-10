@@ -146,12 +146,11 @@ error_code=$(echo $?)
 
 # clean up temporary directories
 if [[ $KEEP_TMP -eq 0 ]]; then
+  echo "$script_name: Cleaning up temporary directories..."
   while read lines; do
     sample=$(echo $lines | cut -f1 -d',')
     for dir in medaka porechop dehost draft_consensus subsample_fastq length_fastq primers_fastq filtered_fastq; do
-      if test -d $OUTPUT_PATH/$sample/$dir; then
-        rm -rf $OUTPUT_PATH/$sample/$dir
-      fi
+      rm -rf $(realpath $OUTPUT_PATH)/$sample/$dir
     done
   done < $INPUT_PATH
 fi
