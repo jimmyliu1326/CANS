@@ -15,5 +15,5 @@ rule combine_fastq_gz:
   threads: 1
   shell:
     """
-    zcat {input.fastq_dir}/*.fastq.gz > {output.combined_fastq}
+    cat {input.fastq_dir}/*.fastq.gz > {output.combined_fastq}
     """
