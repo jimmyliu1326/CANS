@@ -62,7 +62,11 @@ rule length_filter:
     filtered_fastq="{sample}/filtered_fastq/{sample}.fastq"
   shell:
     """
-    cat {input.fastq} | NanoFilt -l {params.min_l} --maxlength {params.max_l} > {output.filtered_fastq}
+    if file {input.fastq} | grep -q compressed; then
+      zcat {input.fastq} | NanoFilt -l {params.min_l} --maxlength {params.max_l} > {output.filtered_fastq}
+    else
+      cat {input.fastq} | NanoFilt -l {params.min_l} --maxlength {params.max_l} > {output.filtered_fastq}
+    fi
     """
 
 rule subsample:
