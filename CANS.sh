@@ -107,6 +107,7 @@ fi
 
 # validate primers FASTA file
 if [[ $PRIMERS_PATH != "NA" ]]; then
+  if ! test -f $PRIMERS_PATH; then echo "${script_name}: The Primers FASTA file does not exist, exiting"; exit 1; fi 
   primers_n=$(cat $PRIMERS_PATH | grep ">" | wc -l)
   if [[ $primers_n -ne 2 ]]; then echo "${script_name}: Primers FASTA file should only contain two sequences, exiting"; exit 1; fi
 fi
