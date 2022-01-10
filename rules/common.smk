@@ -72,7 +72,7 @@ def read_subsample_input(wildcards):
   sample=wildcards["sample"]
   if (config['mode'] == "dynamic" and os.path.basename(config["primers"]) == "NA"):
     return os.path.join(sample, "length_fastq", sample+".fastq")
-  elif (config['mode'] == "static" and os.path.basename(config["primers"]) == "NA"):
+  if (config['mode'] == "static" and os.path.basename(config["primers"]) == "NA"):
     return os.path.join(sample, "filtered_fastq", sample+".fastq")
   else:
     return os.path.join(sample, "primers_fastq", sample+".fastq")

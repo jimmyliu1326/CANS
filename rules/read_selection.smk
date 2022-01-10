@@ -46,7 +46,13 @@ rule selection_by_primers:
     """
     seqtk seq -a {input.fastq} > {output.fasta}
     makeblastdb -dbtype nucl -input_type fasta -in {output.fasta} -out {params.blast_db}
-    blastn -outfmt 6 -dust no -soft_masking false -evalue 1 -out {output.blast_res} -db {params.blast_db} -query {input.primers} -num_threads {threads} -max_target_seqs 100000000
+    blastn -outfmt 6 -dust no -soft_masking false -evalue 1 -out {output.blast_res} -db {params.blast_db} -query {input.primers} -num_threads {threads} -max_target_seqs 10000000
+
+    if [[ $(cat {output.blast_res} | wc -l) -eq 0 ]]; then
+      echo CANS: Cannot detect any reads that contain primer sequences, exiting
+      exit 1
+    fi
+    
     Rscript {params.pipeline_dir}/src/blast_pcr.R {output.blast_res} {output.primers_reads}
     seqtk subseq {input.fastq} {output.primers_reads} > {output.primers_fastq}
     """
