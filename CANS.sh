@@ -9,9 +9,12 @@ Required arguments:
 -o|--output           Path to output directory
 -e|--expected_length  Expected sequence length (bps) of target amplicon
 --mode                Select the mode for full-length reads identification (Options: dynamic/static)
+                      Dynamic: infers the most likely length of target amplicon based on the read length distribution of input data
+                      Static: selects reads solely based on the user-defined expected length of the target amplicon
 
 Optional arguments:
---primers             Path to FASTA file containing forward and reverse primer sequences to select PCR products for consensus building
+--primers             Path to a headerless .tsv file containing forward and reverse primer sequences to select PCR products for consensus building
+                      The primers file should only contain a single set of primers with primer ID, forward, and reverse primer sequences separated by tabs.
 -r|--reference        Reference sequence used for dehosting
 -s|--subsample        Specify the target coverage for consensus calling [Default = 1000]
 -d|--deviation        Specify the read length deviation from (+/-) expected read length allowed for consensus building [Default = 50 bps]
@@ -108,8 +111,8 @@ fi
 # validate primers FASTA file
 if [[ $PRIMERS_PATH != "NA" ]]; then
   if ! test -f $PRIMERS_PATH; then echo "${script_name}: The Primers FASTA file does not exist, exiting"; exit 1; fi 
-  primers_n=$(cat $PRIMERS_PATH | grep ">" | wc -l)
-  if [[ $primers_n -ne 2 ]]; then echo "${script_name}: Primers FASTA file should only contain two sequences, exiting"; exit 1; fi
+  primers_n=$(cat $PRIMERS_PATH | wc -l)
+  if [[ $primers_n -ne 1 ]]; then echo "${script_name}: Primers FASTA file should be a one liner with primer pair ID, forward, and reverse primer in a single line separated by tabs, exiting"; exit 1; fi
 fi
 
 # validate input samples.csv

@@ -29,31 +29,64 @@ rule selection_by_length:
     seqtk subseq {input.reads} {output.read_ids} > {output.length_fastq}
     """
 
+# rule selection_by_primers:
+#   input:
+#     primers=config['primers'],
+#     fastq=primer_search_input
+#   threads: 4
+#   params:
+#     pipeline_dir=config["pipeline_dir"],
+#     blast_db="{sample}/primers_fastq/{sample}"
+#   output:
+#     fasta="{sample}/primers_fastq/{sample}.fasta",
+#     primers_reads="{sample}/primers_fastq/pcr_product.list",
+#     blast_res="{sample}/primers_fastq/blast_res.tab",
+#     primers_fastq="{sample}/primers_fastq/{sample}.fastq"
+#   shell:
+#     """
+#     seqtk seq -a {input.fastq} > {output.fasta}
+#     makeblastdb -dbtype nucl -input_type fasta -in {output.fasta} -out {params.blast_db}
+#     blastn -outfmt 6 -dust no -soft_masking false -evalue 10 -out {output.blast_res} -db {params.blast_db} -query {input.primers} -num_threads {threads} -max_target_seqs 10000000 -task blastn-short -word_size 7
+
+#     if [[ $(cat {output.blast_res} | wc -l) -eq 0 ]]; then
+#       echo CANS: Cannot detect any reads that contain primer sequences, exiting
+#       exit 1
+#     fi
+    
+#     Rscript {params.pipeline_dir}/src/blast_pcr.R {output.blast_res} {output.primers_reads}
+#     seqtk subseq {input.fastq} {output.primers_reads} > {output.primers_fastq}
+#     """
+
 rule selection_by_primers:
   input:
     primers=config['primers'],
     fastq=primer_search_input
   threads: 4
   params:
-    pipeline_dir=config["pipeline_dir"],
-    blast_db="{sample}/primers_fastq/{sample}"
+    max_amplicon_l=int(config['expected_l']+config['deviation']*2)
   output:
     fasta="{sample}/primers_fastq/{sample}.fasta",
+    blast_res="{sample}/primers_fastq/blast_res.out",
     primers_reads="{sample}/primers_fastq/pcr_product.list",
-    blast_res="{sample}/primers_fastq/blast_res.tab",
     primers_fastq="{sample}/primers_fastq/{sample}.fastq"
   shell:
     """
     seqtk seq -a {input.fastq} > {output.fasta}
-    makeblastdb -dbtype nucl -input_type fasta -in {output.fasta} -out {params.blast_db}
-    blastn -outfmt 6 -dust no -soft_masking false -evalue 10 -out {output.blast_res} -db {params.blast_db} -query {input.primers} -num_threads {threads} -max_target_seqs 10000000 -task blastn-short -word_size 7
+    
+    tntblast -i {input.primers} \
+      -o {output.blast_res} \
+      -d {output.fasta} \
+      -e 40 \
+      -m 1 \
+      -a F \
+      -l {params.max_amplicon_l}
 
-    if [[ $(cat {output.blast_res} | wc -l) -eq 0 ]]; then
+    if [[ $(cat {output.blast_res} | grep ">" | wc -l) -eq 0 ]]; then
       echo CANS: Cannot detect any reads that contain primer sequences, exiting
       exit 1
     fi
     
-    Rscript {params.pipeline_dir}/src/blast_pcr.R {output.blast_res} {output.primers_reads}
+    cat {output.blast_res} | grep ">" | sed 's/>//g' > {output.primers_reads}
     seqtk subseq {input.fastq} {output.primers_reads} > {output.primers_fastq}
     """
 

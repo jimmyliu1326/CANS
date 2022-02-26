@@ -21,6 +21,29 @@ source ~/.bashrc
 conda env create -f CANS/conda_env.yml
 ```
 
+## Primer search functionality (Optional)
+
+To search for reads that represent PCR products, the pipeline uses [thermonucleotideBLAST](https://github.com/jgans/thermonucleotideBLAST). Because the tool is not available as a conda package, manual compilation is required. This step is only required if you intend to utilize the primer search functionality.
+
+#### Tested on Ubuntu 16.04+
+1. Install required dependencies
+```
+apt-get update && apt-get install -y \
+    libmpich-dev \
+    libopenmpi-dev \
+    libz-dev
+```
+2. Clone the forked thermonucleotideBLAST respository
+```
+git clone https://github.com/jimmyliu1326/thermonucleotideBLAST.git
+```
+3. Compile
+```
+cd thermonucleotideBLAST
+make all
+```
+4. Add `tntblast` to $PATH
+
 ## Usage
 ```
 Required arguments:
@@ -28,9 +51,12 @@ Required arguments:
 -o|--output           Path to output directory
 -e|--expected_length  Expected sequence length (bps) of target amplicon
 --mode                Select the mode for full-length reads identification (Options: dynamic/static)
+                      Dynamic: infers the most likely length of target amplicon based on the read length distribution of input data
+                      Static: selects reads solely based on the user-defined expected length of the target amplicon
 
 Optional arguments:
---primers             Path to FASTA file containing forward and reverse primer sequences to select PCR products for consensus building
+--primers             Path to a headerless .tsv file containing forward and reverse primer sequences to select PCR products for consensus building
+                      The primers file should only contain a single set of primers with primer ID, forward, and reverse primer sequences separated by tabs.
 -r|--reference        Reference sequence used for dehosting
 -s|--subsample        Specify the target coverage for consensus calling [Default = 1000]
 -d|--deviation        Specify the read length deviation from (+/-) expected read length allowed for consensus building [Default = 50 bps]
@@ -44,7 +70,7 @@ Optional arguments:
 
 ## Example Pipeline Call
 ```
-CANS.sh -i samples.csv -o /path/to/outdir -e 2050
+CANS.sh -i samples.csv -o /path/to/outdir -e 2050 --mode dynamic
 ```
 
 ## Dependencies
@@ -55,3 +81,5 @@ CANS.sh -i samples.csv -o /path/to/outdir -e 2050
 * seqkit >= 0.16.1
 * seqtk >= 1.3
 * snakemake >= 5.3.0
+* NanoFilt >= 2.8.0
+* tntblast >= 2.4
