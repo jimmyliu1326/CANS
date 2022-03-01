@@ -5,12 +5,12 @@ echo "
 $(basename $0) v${VERSION} [options]
 
 Required arguments:
--i|--input            .csv file with first column as sample name and second column as path to fastq, no headers required
+-i|--input            .csv file with first column as sample name and second column as path to a DIRECTORY of fastq file(s), no headers required
 -o|--output           Path to output directory
 -e|--expected_length  Expected sequence length (bps) of target amplicon
 --mode                Select the mode for full-length reads identification (Options: dynamic/static)
-                      Dynamic: infers the most likely length of target amplicon based on the read length distribution of input data
-                      Static: selects reads solely based on the user-defined expected length of the target amplicon
+                      dynamic: infers the most likely length of target amplicon based on the read length distribution of input data
+                      static: selects reads solely based on the user-defined expected length of the target amplicon
 
 Optional arguments:
 --primers             Path to a headerless .tsv file containing forward and reverse primer sequences to select PCR products for consensus building
