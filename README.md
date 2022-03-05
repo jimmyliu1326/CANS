@@ -4,45 +4,47 @@
 ## Description
 A Snakemake pipeline designed to generate consensus sequences for target amplicon Nanopore sequencing. The pipeline supports dehosting of raw reads followed by automated selection of the most probable full-length reads for consensus building.
 
-## Installation via Conda
+## Install method 1 (Conda)
 
-1. Clone the repository
-```
+```bash
+# Clone the repository
 git clone https://github.com/jimmyliu1326/CANS.git
-```
-2. Modify CANS.sh permission and add to $PATH in .bashrc
-```
+# Modify CANS.sh permission and add to $PATH in .bashrc
 chmod +x CANS/CANS.sh
 echo "export PATH=$PWD/CANS:\$PATH" >> ~/.bashrc
 source ~/.bashrc
-```
-3. Create a new conda environment called `cans`
-```
+# Create a new conda environment called `cans`
 conda env create -f CANS/conda_env.yml
-```
 
-## Primer search functionality (Optional)
+#### Compile ThermonucleotideBLAST (Optional)
+# To search for reads that represent PCR products, the pipeline uses thermonucleotideBLAST
+# Because the tool is not available as a conda package, manual compilation is required
+# This step is only required if you intend to utilize the primer search functionality
 
-To search for reads that represent PCR products, the pipeline uses [thermonucleotideBLAST](https://github.com/jgans/thermonucleotideBLAST). Because the tool is not available as a conda package, manual compilation is required. This step is only required if you intend to utilize the primer search functionality.
-
-#### Tested on Ubuntu 16.04+
-1. Install required dependencies
-```
+# install dependencies (tested on Ubuntu 16.04+)
 apt-get update && apt-get install -y \
     libmpich-dev \
     libopenmpi-dev \
     libz-dev
-```
-2. Clone the forked thermonucleotideBLAST respository
-```
+# Clone the forked thermonucleotideBLAST respository
 git clone https://github.com/jimmyliu1326/thermonucleotideBLAST.git
-```
-3. Compile
-```
+# Compile
 cd thermonucleotideBLAST
 make all
+# Add tntblast to $PATH 
 ```
-4. Add `tntblast` to $PATH
+
+## Install method 2 (Docker)
+
+```
+docker pull jimmyliu1326/cans
+```
+
+## Install method 3 (Singularity)
+
+```
+singularity pull docker://jimmyliu1326/cans
+```
 
 ## Usage
 ```
