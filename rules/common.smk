@@ -11,8 +11,10 @@ samples_meta=samples_meta.set_index("Sample", drop = False)
 
 # check if file is gz compressed
 def is_gz_file(filepath):
-    with open(filepath, 'rb') as test_f:
-        return test_f.read(2) == b'\x1f\x8b'
+    if filepath.endswith(".gz"):
+      return True
+    else:
+      return False
 
 # select input fastq for dehosting
 def dehost_input(wildcards):
