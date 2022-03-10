@@ -65,6 +65,7 @@ Optional arguments:
 -m|--model            Specify the flowcell chemistry used for Nanopore sequencing {Options: r9, r10} [Default = r9]
 -t|--threads          Number of threads [Default = 32]
 --notrim              Disable adaptor trimming by Porechop
+--unlock              Unlock Snakemake working directory
 --keep-tmp            Keep all temporary files
 -h|--help             Display help message
 -v|--version          Print version
