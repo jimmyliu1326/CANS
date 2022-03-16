@@ -26,7 +26,7 @@ def dehost_input(wildcards):
   path=samples_meta.Path[wildcards.sample]
   file=glob.glob(path+"/*.fastq*")[0]
   if config["trim"] == 0:
-    if filepath.endswith(".gz"):
+    if file.endswith(".gz"):
       return os.path.join(sample, sample+".fastq.gz")
     else:
       return os.path.join(sample, sample+".fastq")
@@ -40,7 +40,7 @@ def length_selection_input(wildcards):
   file=glob.glob(path+"/*.fastq*")[0]
   if os.path.basename(config["reference"]) == "NA":
     if config["trim"] == 0:
-      if filepath.endswith(".gz"):
+      if file.endswith(".gz"):
         return os.path.join(sample, sample+".fastq.gz")
       else:
         return os.path.join(sample, sample+".fastq")
@@ -56,7 +56,7 @@ def static_length_selection_input(wildcards):
   file=glob.glob(path+"/*.fastq*")[0]
   if os.path.basename(config["reference"]) == "NA":
     if config["trim"] == 0:
-      if filepath.endswith(".gz"):
+      if file.endswith(".gz"):
         return os.path.join(sample, sample+".fastq.gz")
       else:
         return os.path.join(sample, sample+".fastq")
