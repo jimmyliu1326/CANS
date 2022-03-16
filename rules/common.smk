@@ -9,12 +9,16 @@ samples_meta=pd.read_csv(samples_tbl, header = None, dtype = str)
 samples_meta.columns=["Sample", "Path"]
 samples_meta=samples_meta.set_index("Sample", drop = False)
 
-# check if file is gz compressed
-def is_gz_file(filepath):
-    if filepath.endswith(".gz"):
-      return True
-    else:
-      return False
+## helper functions
+# select input fastq for trimming
+def trim_input(wildcards):
+  sample=wildcards["sample"]
+  path=samples_meta.Path[wildcards.sample]
+  file=glob.glob(path+"/*.fastq*")[0]
+  if file.endswith(".gz"):
+    return os.path.join(sample, sample+".fastq.gz")
+  else:
+    return os.path.join(sample, sample+".fastq")
 
 # select input fastq for dehosting
 def dehost_input(wildcards):
@@ -22,7 +26,7 @@ def dehost_input(wildcards):
   path=samples_meta.Path[wildcards.sample]
   file=glob.glob(path+"/*.fastq*")[0]
   if config["trim"] == 0:
-    if is_gz_file(file):
+    if filepath.endswith(".gz"):
       return os.path.join(sample, sample+".fastq.gz")
     else:
       return os.path.join(sample, sample+".fastq")

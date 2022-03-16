@@ -1,6 +1,6 @@
 rule porechop:
   input:
-    reads="{sample}/{sample}.fastq"
+    reads=trim_input
   threads: 32
   output:
     trimmed_reads="{sample}/porechop/{sample}_trimmed.fastq"
