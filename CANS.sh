@@ -21,7 +21,6 @@ Optional arguments:
 -m|--model            Specify the flowcell chemistry used for Nanopore sequencing {Options: r9, r10} [Default = r9]
 -t|--threads          Number of threads [Default = 32]
 --notrim              Disable adaptor trimming by Porechop
---unlock              Unlock Snakemake working directory
 --keep-tmp            Keep all temporary files
 -h|--help             Display help message
 -v|--version          Print version
@@ -40,10 +39,9 @@ DEVIATION=50
 VERSION="1.0"
 PRIMERS_PATH="NA"
 EXPECTED_LENGTH=0
-UNLOCK=0
 
 # parse arguments
-opts=`getopt -o hi:o:t:s:m:r:e:s:d:v -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length:,version,primers:,mode:,unlock -- "$@"`
+opts=`getopt -o hi:o:t:s:m:r:e:s:d:v -l help,input:,output:,threads:,reference:,notrim,model:,keep-tmp,subsample:,expected_length:,version,primers:,mode: -- "$@"`
 eval set -- "$opts"
 if [ $? != 0 ] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
 if [[ $1 =~ ^--$ ]] ; then echo "${script_name}: Invalid arguments used, exiting"; usage; exit 1 ; fi
@@ -61,7 +59,6 @@ while true; do
         -d|--deviation) DEVIATION=$2; shift 2;;
         -e|--expected_length) EXPECTED_LENGTH=$2; shift 2;;
         --notrim) TRIM=0; shift 1;;
-        --unlock) UNLOCK=1; shift 1;;
         --keep-tmp) KEEP_TMP=1; shift 1;;
         --) shift; break ;;
         -h|--help) usage; exit 0;;
@@ -134,41 +131,25 @@ done < $INPUT_PATH
 if ! test -d $OUTPUT_PATH; then mkdir -p $OUTPUT_PATH; fi
 
 # call snakemake
-if [[ $UNLOCK -eq 0 ]]; then
-  snakemake -k --snakefile $script_dir/Snakefile --cores $THREADS \
-    --config samples=$(realpath $INPUT_PATH) \
-    outdir=$(realpath $OUTPUT_PATH) \
-    pipeline_dir=$script_dir \
-    trim=$TRIM \
-    model=$MODEL \
-    threads=$THREADS \
-    subsample=$SUBSAMPLE \
-    reference=$(realpath $REFERENCE_PATH) \
-    expected_l=$EXPECTED_LENGTH \
-    deviation=$DEVIATION \
-    mode=$MODE \
-    primers=$(realpath $PRIMERS_PATH)
-else
-  snakemake -k --unlock --snakefile $script_dir/Snakefile --cores $THREADS \
-    --config samples=$(realpath $INPUT_PATH) \
-    outdir=$(realpath $OUTPUT_PATH) \
-    pipeline_dir=$script_dir \
-    trim=$TRIM \
-    model=$MODEL \
-    threads=$THREADS \
-    subsample=$SUBSAMPLE \
-    reference=$(realpath $REFERENCE_PATH) \
-    expected_l=$EXPECTED_LENGTH \
-    deviation=$DEVIATION \
-    mode=$MODE \
-    primers=$(realpath $PRIMERS_PATH)
-fi
+snakemake -k --snakefile $script_dir/Snakefile --cores $THREADS \
+  --config samples=$(realpath $INPUT_PATH) \
+  outdir=$(realpath $OUTPUT_PATH) \
+  pipeline_dir=$script_dir \
+  trim=$TRIM \
+  model=$MODEL \
+  threads=$THREADS \
+  subsample=$SUBSAMPLE \
+  reference=$(realpath $REFERENCE_PATH) \
+  expected_l=$EXPECTED_LENGTH \
+  deviation=$DEVIATION \
+  mode=$MODE \
+  primers=$(realpath $PRIMERS_PATH) \
+  --no-lock
 
 # get pipeline error code
 error_code=$(echo $?)
 
 # clean up temporary directories
-if [[ $UNLOCK -eq 0 ]]; then
 if [[ $KEEP_TMP -eq 0 ]]; then
   echo "$script_name: Cleaning up temporary directories..."
   while read lines; do
@@ -180,10 +161,8 @@ if [[ $KEEP_TMP -eq 0 ]]; then
     done
   done < $INPUT_PATH
 fi
-fi
 
 # check pipeline success
-if [[ $UNLOCK -eq 0 ]]; then
 if [[ $error_code -eq 0 ]]; then
   echo "${script_name}: Analysis ran to completion successfully!"
   echo "${script_name}: Results have been written to: $(realpath $OUTPUT_PATH)"
@@ -191,5 +170,4 @@ if [[ $error_code -eq 0 ]]; then
 else
   echo "${script_name}: Error(s) encountered during analysis run, check the above logs"
   exit 1
-fi
 fi
