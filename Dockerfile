@@ -10,7 +10,7 @@ RUN apt-get update && \
     mkdir /.cache && \
     chmod a+rwX /.cache
 
-RUN micromamba install -n base -y -c bioconda -c conda-forge -f /CANS/conda_env.yml && \
+RUN micromamba install -n base -y -f /CANS/conda_env.yml && \
     micromamba clean --all --yes && \
     rm -rf $CONDA_DIR/conda-meta && \
     rm -rf $CONDA_DIR/include && \
