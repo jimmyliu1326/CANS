@@ -7,8 +7,8 @@ RUN apt-get update && \
     git clone https://github.com/jimmyliu1326/CANS.git && \
     chmod +x /CANS/CANS.sh && \
     ln -s /CANS/CANS.sh /usr/local/bin/CANS.sh && \
-    mkdir /.cache && \
-    chmod a+rwX /.cache
+    mkdir ~/.cache && \
+    chmod a+rwX ~/.cache
 
 RUN micromamba install -n base -y -f /CANS/conda_env.yml && \
     micromamba clean --all --yes && \
