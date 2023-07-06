@@ -144,7 +144,7 @@ snakemake -k --snakefile $script_dir/Snakefile --cores $THREADS \
   deviation=$DEVIATION \
   mode=$MODE \
   primers=$(realpath $PRIMERS_PATH) \
-  --no-lock
+  --nolock
 
 # get pipeline error code
 error_code=$(echo $?)
